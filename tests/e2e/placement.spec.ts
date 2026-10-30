@@ -31,7 +31,7 @@ test('explicit insertion target, nested tree and visible safe reassignment', asy
   await page.getByRole('combobox', { name: 'Zugehöriger Rahmen', exact: true }).selectOption({ label: 'Fleet A' });
   await expect.poll(() => page.evaluate(() => {
     const doc = JSON.parse(localStorage.getItem('vcf-bricks.project.v1')!);
-    return doc.nodes.find((node: { label: string }) => node.label === 'VC A').parentId;
+    return doc?.nodes.find((node: { label: string }) => node.label === 'VC A')?.parentId;
   })).toBe(await target.inputValue());
   await page.getByRole('button', { name: 'Rückgängig', exact: true }).click();
   await page.getByRole('button', { name: 'VC A auswählen', exact: true }).click();
