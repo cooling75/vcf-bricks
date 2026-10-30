@@ -1,0 +1,74 @@
+.vcf-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  min-width: 0;
+  overflow: hidden;
+  background: #f5f8fc;
+  color: #142b49;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  --xy-background-color: #f5f8fc;
+  --xy-edge-stroke-selected: #2563eb;
+  --xy-controls-button-background-color: #fff;
+  --xy-controls-button-color: #142b49;
+  --xy-node-boxshadow-hover: none;
+}
+.vcf-canvas .react-flow__node { border-radius: 9px; }
+.vcf-canvas .react-flow__node:focus-visible { outline: 3px solid #2563eb; outline-offset: 5px; }
+.vcf-canvas .vcf-canvas__brick {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%; height: 100%;
+  padding: 10px 13px 9px 15px;
+  background: #fff;
+  border: 1px solid #cfdae6;
+  border-left: 4px solid var(--brick-color);
+  border-radius: 9px;
+  box-shadow: 0 2px 6px #142b4909;
+  display: flex; flex-direction: column; justify-content: center; gap: 3px;
+}
+.vcf-canvas .vcf-canvas__brick.is-selected { border-color: #2563eb; border-left-color: var(--brick-color); box-shadow: 0 0 0 2px #2563eb33; }
+.vcf-canvas .vcf-canvas__brick-type { color: #526579; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.vcf-canvas .vcf-canvas__brick-name { font-size: 12px; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 650; }
+.vcf-canvas .vcf-canvas__brick-meta { color: #64748b; font-size: 10px; line-height: 12px; }
+.vcf-canvas .vcf-canvas__boundary {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%; height: 100%;
+  border: 2px solid var(--brick-color);
+  border-radius: 12px;
+  background: transparent;
+}
+.vcf-canvas .vcf-canvas__boundary.is-selected { box-shadow: 0 0 0 3px #2563eb22; }
+.vcf-canvas .vcf-canvas__boundary-header {
+  position: absolute; top: -13px; left: 14px;
+  max-width: calc(100% - 40px);
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 9px;
+  background: #f5f8fc;
+  border-radius: 5px;
+  font-size: 11px;
+  cursor: grab;
+}
+.vcf-canvas .vcf-canvas__boundary-header strong { max-width: 300px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 650; }
+.vcf-canvas .vcf-canvas__boundary-kind { color: var(--brick-color); font-size: 10px; font-weight: 750; white-space: nowrap; }
+.vcf-canvas .react-flow__handle { width: 9px; height: 9px; min-width: 9px; min-height: 9px; background: #fff; border: 2px solid var(--brick-color, #2563eb); }
+.vcf-canvas .react-flow__handle:hover, .vcf-canvas .react-flow__handle.connecting { background: #2563eb; border-color: #2563eb; }
+.vcf-canvas .react-flow__resize-control.handle { width: 9px; height: 9px; border-radius: 2px; }
+.vcf-canvas .react-flow__controls { overflow: hidden; border: 1px solid #d9e2ec; border-radius: 7px; box-shadow: 0 3px 10px #142b4912; }
+.vcf-canvas .react-flow__controls-button { width: 30px; height: 30px; }
+.vcf-canvas .vcf-canvas__button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 8px 11px; min-height: 34px;
+  border: 1px solid #d1dce8; border-radius: 7px;
+  background: #fff; color: #142b49;
+  font: inherit; font-size: 11px; font-weight: 650;
+  cursor: pointer; box-shadow: 0 2px 5px #142b4908;
+}
+.vcf-canvas .vcf-canvas__button:hover { background: #edf4fe; border-color: #93b4e2; }
+.vcf-canvas .vcf-canvas__button:focus-visible, .vcf-canvas .react-flow__controls-button:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+.vcf-canvas .vcf-canvas__button--danger { color: #b42318; }
+.vcf-canvas .vcf-canvas__edge-actions { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 1px solid #d1dce8; border-radius: 9px; background: #fff; box-shadow: 0 4px 20px #142b4914; font-size: 12px; }
+.vcf-canvas .vcf-canvas__empty { max-width: 260px; margin-top: 48px; padding: 14px 18px; background: #fff; border: 1px dashed #c1cfdf; border-radius: 9px; font-size: 12px; line-height: 1.6; text-align: center; pointer-events: none; }
+.vcf-canvas .vcf-canvas__sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

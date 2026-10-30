@@ -1,0 +1,55 @@
+import { describe, expect, it } from 'vitest';
+import type { ArchitectureDocument, ArchitectureNode } from '../contracts';
+import { toFlowGraph } from './flowAdapter';
+
+function brick(id: string, parentId?: string): ArchitectureNode {
+  return { id, kind: 'esx-host', label: id, parentId, position: { x: 30, y: 45 }, config: { version: '', instances: 1, notes: '' } };
+}
+function document(nodes: ArchitectureNode[]): ArchitectureDocument {
+  return { schemaVersion: 1, id: 'test', title: 'Test', profile: 'unspecified', mode: 'sandbox', nodes, edges: [] };
+}
+
+describe('toFlowGraph', () => {
+  it('replaces non-finite positions and sizes with usable geometry', () => {
+    const broken = { ...brick('fleet'), kind: 'fleet' as const, position: { x: NaN, y: Infinity }, size: { width: -1, height: NaN } };
+    const graph = toFlowGraph(document([broken]), null);
+    expect(graph.nodes[0]).toMatchObject({ position: { x: 0, y: 0 }, width: 600, height: 380 });
+  });
+  it('maps labelled directed links and removes dangling or duplicate links without changing source data', () => {
+    const source = document([brick('a'), brick('b')]);
+    source.edges = [
+      { id: 'link', source: 'a', target: 'b', kind: 'manages' },
+      { id: 'link', source: 'b', target: 'a', kind: 'connects' },
+      { id: 'missing', source: 'a', target: 'absent', kind: 'connects' },
+    ];
+    const graph = toFlowGraph(source, null);
+    expect(graph.edges).toHaveLength(1);
+    expect(graph.edges[0]).toMatchObject({ id: 'link', source: 'a', target: 'b', label: 'verwaltet', sourceHandle: 'out', targetHandle: 'in' });
+    expect(graph.edges[0].markerEnd).toBeTruthy();
+    expect(source.edges).toHaveLength(3);
+  });
+  it('fails safe on duplicate IDs, dangling parents, self parents and cycles without mutating the document', () => {
+    const source = document([
+      { ...brick('a', 'b'), kind: 'fleet' },
+      { ...brick('b', 'a'), kind: 'instance' },
+      brick('orphan', 'missing'), brick('self', 'self'), brick('a'),
+    ]);
+    const before = JSON.stringify(source);
+    const graph = toFlowGraph(source, null);
+    expect(graph.nodes.map(node => node.id)).toEqual(['b', 'a', 'orphan', 'self']);
+    expect(graph.nodes.find(node => node.id === 'b')?.parentId).toBeUndefined();
+    expect(graph.nodes.find(node => node.id === 'a')?.parentId).toBe('b');
+    expect(graph.nodes.find(node => node.id === 'orphan')?.parentId).toBeUndefined();
+    expect(graph.nodes.find(node => node.id === 'self')?.parentId).toBeUndefined();
+    expect(JSON.stringify(source)).toBe(before);
+  });
+  it('maps nested nodes parent-first while retaining relative positions and controlled selection', () => {
+    const root = { ...brick('fleet'), kind: 'fleet' as const, size: { width: 900, height: 600 } };
+    const instance = { ...brick('instance', 'fleet'), kind: 'instance' as const };
+    const graph = toFlowGraph(document([brick('host', 'instance'), instance, root]), 'host');
+    expect(graph.nodes.map(node => node.id)).toEqual(['fleet', 'instance', 'host']);
+    expect(graph.nodes[2]).toMatchObject({ parentId: 'instance', position: { x: 30, y: 45 }, selected: true, type: 'componentBrick' });
+    expect(graph.nodes[0]).toMatchObject({ type: 'boundaryNode', width: 900, height: 600, selected: false });
+    expect(graph.nodes[2].zIndex).toBeGreaterThan(graph.nodes[0].zIndex ?? 0);
+  });
+});

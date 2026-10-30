@@ -1,0 +1,3 @@
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+export default defineConfig({ plugins: [react()], base: '/vcf-bricks/', test: { environment: 'jsdom', include: ['src/**/*.test.{ts,tsx}'], setupFiles: ['./src/testSetup.ts'], restoreMocks: true } });

@@ -1,0 +1,30 @@
+import { chromium } from '@playwright/test';
+import assert from 'node:assert/strict';
+const browser = await chromium.launch({ headless: true });
+const page = await browser.newPage({ viewport: { width: 1600, height: 1000 } });
+const errors = [];
+page.on('pageerror', error => errors.push(error.message));
+try {
+  await page.goto('http://127.0.0.1:4173/vcf-bricks/');
+  await page.locator('.vcf-canvas .react-flow__node-componentBrick').first().waitFor();
+  await page.getByRole('button', { name: 'Alles einpassen', exact: true }).click();
+  const components = page.locator('.vcf-canvas .react-flow__node-componentBrick');
+  console.log('components', await components.count(), 'boundaries', await page.locator('.react-flow__node-boundaryNode').count());
+  const component = components.first();
+  const id = await component.getAttribute('data-id');
+  await component.click();
+  await page.waitForTimeout(100);
+  assert(await component.evaluate(el => el.classList.contains('selected')), 'component is selected instead of its root boundary');
+  const before = await component.boundingBox();
+  await page.mouse.move(before.x + 40, before.y + 30);
+  await page.mouse.down();
+  await page.mouse.move(before.x + 85, before.y + 65, { steps: 10 });
+  await page.mouse.up();
+  await page.waitForTimeout(400);
+  const after = await component.boundingBox();
+  assert(after.x > before.x + 20 && after.y > before.y + 15, 'component drag changes position');
+  await page.reload();
+  await page.locator(`.react-flow__node[data-id="${id}"]`).waitFor();
+  console.log('selection and drag verified', { before, after, errors });
+  assert.deepEqual(errors, []);
+} finally { await browser.close(); }

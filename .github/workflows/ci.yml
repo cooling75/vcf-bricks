@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck, unit tests, build and Chromium
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+    steps:
+      # Release tags verified against the official actions repositories; pin commits.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Node.js 24
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test:run
+      - name: Production build
+        run: npm run build
+      - name: Install Chromium and system dependencies
+        run: npx --no-install playwright install --with-deps chromium
+      - name: Browser tests
+        run: npm run test:e2e -- --project=chromium
