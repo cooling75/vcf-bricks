@@ -2,7 +2,7 @@
 
 Browser-Workshoptool zum gemeinsamen Skizzieren von VMware Cloud Foundation (VCF) und vSphere Kubernetes Service (VKS): Bausteine, Beziehungen und schlichte farbige Rahmen für Fleet, Instanz und Domains. Gedacht für Architekturgespräche und Messe-Demos, nicht für Produktionsplanung oder automatisierte Bereitstellung.
 
-**Stand:** in Entwicklung. Die folgenden Schritte sind zugleich Abnahmecheckliste; diese README ist kein Nachweis einer fertigen oder bereits veröffentlichten Anwendung. Beispiele sind generische Gesprächsgrundlagen, keine offiziell abgenommenen Mustervorlagen.
+**Stand:** benutzbarer MVP, veröffentlicht unter **https://cooling75.github.io/vcf-bricks/**. Typecheck, 56 Unit-Tests und 6 Chromium-Browsertests erfolgreich; die Browsertests wurden zusätzlich direkt gegen die veröffentlichte Seite ausgeführt. Beispiele sind generische Gesprächsgrundlagen, keine offiziell abgenommenen Mustervorlagen.
 
 ## Lokal starten
 
@@ -50,7 +50,7 @@ Auf gemeinsam genutzten Geräten nach dem Workshop die Website-/Speicherdaten f�
 - `pages.yml`: Push nach `main` oder manueller Start auf `main`; eigener Typecheck-/Unit-Test-/Build-Gate, danach separater Deploymentjob. Auch die Chromium-Browsertests gegen den Produktionsbuild müssen vor jeder Veröffentlichung erfolgreich sein.
 - Actions sind auf überprüfte Release-Commit-SHAs gepinnt. Nur der Deploymentjob erhält `pages: write` und `id-token: write`; PR-Code erhält keine Deploymentrechte.
 
-Zieladresse: **https://cooling75.github.io/vcf-bricks/** — geplant, hier nicht als live bestätigt. Für die erste Freigabe in GitHub unter **Settings → Pages → Source: GitHub Actions** aktivieren, das Environment `github-pages` auf `main` begrenzen und nach einem erfolgreichen Deployment die Zieladresse inklusive Neuladen und JSON-Roundtrip prüfen. Es wird nur `dist/` veröffentlicht. Der Vite-Basispfad ist `/vcf-bricks/`; bei Umbenennung oder anderer Hosting-URL muss er geprüft werden.
+Liveadresse: **https://cooling75.github.io/vcf-bricks/**. Pages verwendet **GitHub Actions**; das Environment `github-pages` erlaubt nur `main`. Nach Änderungen die Zieladresse inklusive Neuladen und JSON-Roundtrip prüfen. Für die gleiche automatisierte Abnahme gegen die veröffentlichte Seite: `PLAYWRIGHT_BASE_URL=https://cooling75.github.io/vcf-bricks/ npm run test:e2e`. Es wird nur `dist/` veröffentlicht. Der Vite-Basispfad ist `/vcf-bricks/`; bei Umbenennung oder anderer Hosting-URL muss er geprüft werden.
 
 Hinweise zum Hosting: [GitHub Pages mit eigenen Workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
 
