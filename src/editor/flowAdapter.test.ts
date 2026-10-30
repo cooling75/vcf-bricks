@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { ArchitectureDocument, ArchitectureNode } from '../contracts';
 import { toFlowGraph } from './flowAdapter';
+import { findDropTarget, insertNode, assignNode } from '../domain/placement';
+import { parseProject, serializeProject } from '../domain/schema';
 
 function brick(id: string, parentId?: string): ArchitectureNode {
   return { id, kind: 'esx-host', label: id, parentId, position: { x: 30, y: 45 }, config: { version: '', instances: 1, notes: '' } };
@@ -10,6 +12,17 @@ function document(nodes: ArchitectureNode[]): ArchitectureDocument {
 }
 
 describe('toFlowGraph', () => {
+  it('keeps valid imported sizeless boundaries at the same rendered size after placement', () => {
+    const parsed = parseProject(serializeProject(document([{...brick('fleet'),kind:'fleet',position:{x:0,y:0}},brick('leaf')])));
+    if (!parsed.ok) throw new Error('Fixture must import');
+    const point = {x:300,y:200};
+    const inserted = insertNode(parsed.value,'network',findDropTarget(parsed.value,point),point);
+    const assigned = assignNode(inserted,'leaf','fleet');
+    const graph = toFlowGraph(assigned,null);
+    expect(graph.nodes[0]).toMatchObject({id:'fleet',width:600,height:380,style:{width:600,height:380}});
+    expect(graph.nodes.find(node=>node.id===inserted.nodes.at(-1)!.id)).toMatchObject({parentId:'fleet',position:point,width:174,height:76});
+    expect(graph.nodes.find(node=>node.id==='leaf')).toMatchObject({parentId:'fleet',width:174,height:76});
+  });
   it('replaces non-finite positions and sizes with usable geometry', () => {
     const broken = { ...brick('fleet'), kind: 'fleet' as const, position: { x: NaN, y: Infinity }, size: { width: -1, height: NaN } };
     const graph = toFlowGraph(document([broken]), null);

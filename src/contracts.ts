@@ -27,4 +27,13 @@ export interface ArchitectureCanvasProps {
   onResize: (id: string, size: { width: number; height: number }) => void;
   onConnect: (source: string, target: string) => void;
   onRemoveEdge: (id: string) => void;
+  /** Explicit insertion target; independent from transient selection. */
+  insertionTargetId?: string | null;
+  /** HTML catalog drop in absolute canvas coordinates. */
+  onPlace?: (kind: ComponentKind, position: Point, parentId?: string) => void;
+  /** Atomic gesture: reparent and move together, in absolute canvas coordinates. */
+  onRelocate?: (id: string, position: Point, parentId?: string) => void;
+  focusRequest?: { id: string; sequence: number } | null;
 }
+
+export const CATALOG_DRAG_TYPE = 'application/x-vcf-bricks-kind';

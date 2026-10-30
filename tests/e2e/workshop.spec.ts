@@ -39,6 +39,7 @@ test('group boundaries, connections, duplicate, delete and sample loading',async
   await page.getByLabel('Komponentenname',{exact:true}).fill('Primary VC');
   await page.getByRole('button',{name:'Duplizieren',exact:true}).click();
   await page.getByLabel('Komponentenname',{exact:true}).fill('Secondary VC');
+  await page.getByText('Kommunikationsbeziehungen (optional)',{exact:true}).click();
   await page.getByRole('combobox',{name:'Verbindungsziel',exact:true}).selectOption({label:'Primary VC'});
   await page.getByRole('button',{name:'Verbindung hinzufügen',exact:true}).click();
   await expect(page.getByText('1 Verbindung',{exact:true})).toBeVisible();

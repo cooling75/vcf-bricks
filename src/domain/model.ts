@@ -1,5 +1,6 @@
 import type { ArchitectureDocument, ArchitectureNode, ComponentKind, Point, RelationKind } from '../contracts';
 import { CATALOG, getCatalogItem } from './catalog';
+import { effectiveNodeSize as dimensions } from './geometry';
 
 const MAX_NODES = 200;
 const MAX_EDGES = 400;
@@ -19,7 +20,7 @@ const boundary = (node: ArchitectureNode) => getCatalogItem(node.kind).isBoundar
 const pointValid = (p: Point) => !!p && Number.isFinite(p.x) && Number.isFinite(p.y) && Math.abs(p.x) <= COORDINATE_LIMIT && Math.abs(p.y) <= COORDINATE_LIMIT;
 const sizeValid = (s: { width: number; height: number }) => !!s && Number.isFinite(s.width) && Number.isFinite(s.height) && s.width >= 80 && s.height >= 60 && s.width <= 10_000 && s.height <= 10_000;
 const textValid = (s: string, max: number) => typeof s === 'string' && s.length <= max;
-const dimensions = (node: ArchitectureNode) => node.size ?? { width: 180, height: 80 };
+
 const DEFAULT_SIZES: Partial<Record<ComponentKind, { width: number; height: number }>> = {
   fleet: { width: 1600, height: 1100 }, instance: { width: 1360, height: 900 },
   'management-domain': { width: 1100, height: 760 }, 'workload-domain': { width: 1100, height: 760 },

@@ -4,6 +4,12 @@ Browser-Workshoptool zum gemeinsamen Skizzieren von VMware Cloud Foundation (VCF
 
 **Stand:** benutzbarer MVP, veröffentlicht unter **https://cooling75.github.io/vcf-bricks/**. Typecheck, 56 Unit-Tests und 6 Chromium-Browsertests erfolgreich; die Browsertests wurden zusätzlich direkt gegen die veröffentlichte Seite ausgeführt. Beispiele sind generische Gesprächsgrundlagen, keine offiziell abgenommenen Mustervorlagen.
 
+## Platzieren und Zuordnen (diese Änderung)
+
+Explizites Einfügeziel, Katalog-Drag-and-drop mit Zielvorschau, Umordnen durch Ziehen oder Eigenschaftenauswahl und ein aufklappbarer Strukturbaum vereinfachen den Aufbau. Bestehende Kommunikationsbeziehungen bleiben erhalten, ihre Werkzeuge sind standardmäßig eingeklappt. Details und Bedienwege: [Platzieren und Zuordnen](docs/placement-and-assignment.md).
+
+Die Onlinevariante benötigt keine Nachbildung der physischen Messe-Musterlösung. Dark Mode, eine geprüfte Katalogerweiterung und individuell einstellbare Rahmen-Schriftgrößen sind nicht Teil dieser Änderung.
+
 ## Lokal starten
 
 Voraussetzungen: Node.js **24** (wie in CI), npm und das eingecheckte `package-lock.json`.
