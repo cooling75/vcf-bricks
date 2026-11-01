@@ -24,7 +24,7 @@ describe('ArchitectureCanvas', () => {
   it('renders usable controls and routes node/pane selection to the owner', async () => {
     const callbacks = props();
     const { container } = render(<ArchitectureCanvas {...callbacks} />);
-    expect(screen.getByRole('button', { name: 'Alles einpassen' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Fit all' })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Host A')).toBeInTheDocument());
     fireEvent.click(screen.getByText('Host A'));
     expect(callbacks.onSelect).toHaveBeenCalledWith('host');

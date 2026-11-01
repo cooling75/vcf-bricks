@@ -31,7 +31,7 @@ afterEach(() => { cleanup(); vi.clearAllMocks(); });
 describe('canvas placement gestures', () => {
   it('transforms catalog drop coordinates, highlights deepest boundary, and clears feedback', () => {
     const p = props(); const { container } = render(<ArchitectureCanvas {...p} insertionTargetId="outer" />);
-    const canvas = screen.getByRole('region', { name: 'Architektur-Baufläche' });
+    const canvas = screen.getByRole('region', { name: 'Architecture canvas' });
     catalogEvent('dragOver', canvas, 300, 250, 'esx-host');
     expect(container.querySelector('[data-drop-target="inner"]')).toBeInTheDocument();
     expect(container.querySelector('[data-insertion-target="outer"]')).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe('canvas placement gestures', () => {
   });
   it('rejects readable invalid drags and clears feedback when leaving the canvas', () => {
     const p = props(); const { container } = render(<ArchitectureCanvas {...p} />);
-    const canvas = screen.getByRole('region', { name: 'Architektur-Baufläche' });
+    const canvas = screen.getByRole('region', { name: 'Architecture canvas' });
     catalogEvent('dragOver', canvas, 300, 250, 'invalid');
     expect(container.querySelector('[data-drop-target]')).not.toBeInTheDocument();
     // Real browsers hide the payload during dragover but preserve the MIME type.
@@ -92,9 +92,9 @@ describe('canvas placement gestures', () => {
   it('focuses only explicit requests, and offers selected focus plus 100% controls', () => {
     const p = props(); const { rerender } = render(<ArchitectureCanvas {...p} />);
     expect(flow.fitView).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole('button', { name: 'Auswahl fokussieren' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Focus selection' }));
     expect(flow.fitView).toHaveBeenLastCalledWith(expect.objectContaining({ nodes: [{ id: 'host' }], maxZoom: 1 }));
-    fireEvent.click(screen.getByRole('button', { name: '100 %' }));
+    fireEvent.click(screen.getByRole('button', { name: '100%' }));
     expect(flow.zoomTo).toHaveBeenCalledWith(1, expect.any(Object));
     rerender(<ArchitectureCanvas {...p} focusRequest={{ id: 'inner', sequence: 1 }} />);
     expect(flow.fitView).toHaveBeenLastCalledWith(expect.objectContaining({ nodes: [{ id: 'inner' }], maxZoom: 1 }));

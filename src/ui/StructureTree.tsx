@@ -28,9 +28,9 @@ export function StructureTree({ nodes, selectedId, onSelect }: Props) {
       const hidden = collapsed.has(node.id);
       return <li key={node.id}>
         <div className={`structure-tree-row ${node.id === selectedId ? 'selected' : ''}`}>
-          {children ? <button type="button" className="tree-toggle" aria-label={`${node.label} ${hidden ? 'ausklappen' : 'einklappen'}`} aria-expanded={!hidden}
+          {children ? <button type="button" className="tree-toggle" aria-label={`${hidden ? 'Expand' : 'Collapse'} ${node.label}`} aria-expanded={!hidden}
             onClick={() => setCollapsed(current => { const next = new Set(current); if (next.has(node.id)) next.delete(node.id); else next.add(node.id); return next; })}>{hidden ? '▸' : '▾'}</button> : <span className="tree-toggle-spacer" />}
-          <button className="structure-item" aria-label={`${node.label} auswählen`} onClick={() => onSelect(node.id)}>
+          <button className="structure-item" aria-label={`Select ${node.label}`} onClick={() => onSelect(node.id)}>
             <span className="structure-dot" style={{ background: getCatalogItem(node.kind).color }} />
             <span><strong>{node.label}</strong><small>{getCatalogItem(node.kind).label}</small></span>
           </button>
@@ -39,5 +39,5 @@ export function StructureTree({ nodes, selectedId, onSelect }: Props) {
       </li>;
     })}</ul>;
   }
-  return <nav aria-label="Architekturstruktur">{branch()}</nav>;
+  return <nav aria-label="Architecture structure">{branch()}</nav>;
 }

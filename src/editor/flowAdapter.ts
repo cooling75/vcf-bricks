@@ -68,8 +68,8 @@ export function toFlowGraph(document: ArchitectureDocument, selectedId: string |
     };
   });
   const labels: Record<RelationKind, string> = {
-    contains: 'enthält', manages: 'verwaltet', 'runs-on': 'läuft auf',
-    'uses-network': 'nutzt Netzwerk', 'uses-storage': 'nutzt Storage', connects: 'verbindet',
+    contains: 'contains', manages: 'manages', 'runs-on': 'runs on',
+    'uses-network': 'uses network', 'uses-storage': 'uses storage', connects: 'connects to',
   };
   const edgeIds = new Set<string>();
   const edges: Edge[] = [];

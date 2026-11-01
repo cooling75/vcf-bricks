@@ -37,7 +37,7 @@ describe('toFlowGraph', () => {
     ];
     const graph = toFlowGraph(source, null);
     expect(graph.edges).toHaveLength(1);
-    expect(graph.edges[0]).toMatchObject({ id: 'link', source: 'a', target: 'b', label: 'verwaltet', sourceHandle: 'out', targetHandle: 'in' });
+    expect(graph.edges[0]).toMatchObject({ id: 'link', source: 'a', target: 'b', label: 'manages', sourceHandle: 'out', targetHandle: 'in' });
     expect(graph.edges[0].markerEnd).toBeTruthy();
     expect(source.edges).toHaveLength(3);
   });
@@ -65,4 +65,16 @@ describe('toFlowGraph', () => {
     expect(graph.nodes[0]).toMatchObject({ type: 'boundaryNode', width: 900, height: 600, selected: false });
     expect(graph.nodes[2].zIndex).toBeGreaterThan(graph.nodes[0].zIndex ?? 0);
   });
+});
+
+describe('English relationship labels', () => {
+ it.each([['contains','contains'],['manages','manages'],['runs-on','runs on'],['uses-network','uses network'],['uses-storage','uses storage'],['connects','connects to']] as const)('renders %s in English without changing labels or keys', (kind,label) => {
+  const source = document([{...brick('a'),label:'Mein Baustein'}, {...brick('b'),label:'Mein Ziel'}]);
+  source.edges = [{id:'relation',source:'a',target:'b',kind}];
+  const before = JSON.stringify(source);
+  const edge = toFlowGraph(source,null).edges[0];
+  expect(edge.label).toBe(label);
+  expect(edge.ariaLabel).toBe(`Mein Baustein ${label} Mein Ziel`);
+  expect(JSON.stringify(source)).toBe(before);
+ });
 });

@@ -3,13 +3,13 @@ import { getHints } from './hints';
 import { addNode, connectNodes, createEmptyDocument, updateNode } from './model';
 
 describe('nonbinding workshop hints', () => {
-  it('provides German advisory text without changing the project', () => {
+  it('provides English advisory text without changing the project', () => {
     const doc = createEmptyDocument();
     const before = JSON.stringify(doc);
     const hints = getHints(doc);
     expect(hints.length).toBeGreaterThan(0);
     expect(JSON.stringify(doc)).toBe(before);
-    expect(hints.some(h => /Hinweise.*übersteuerbar/i.test(h.message))).toBe(true);
+    expect(hints.some(h => /All hints can be overridden/i.test(h.message))).toBe(true);
     for (const hint of hints) {
       expect(hint.message).toBeTruthy();
       expect(['info', 'warning']).toContain(hint.severity);
@@ -20,15 +20,15 @@ describe('nonbinding workshop hints', () => {
   it('distinguishes logical scope from hosting and does not promise hardware suitability', () => {
     const doc = addNode(addNode(createEmptyDocument(), 'fleet'), 'esx-host');
     const messages = getHints(doc).map(h => h.message).join(' ');
-    expect(messages).toMatch(/logisch.*Hosting/i);
-    expect(messages).toMatch(/keine Hardware-/i);
+    expect(messages).toMatch(/logical scopes.*physical hosting/i);
+    expect(messages).toMatch(/do not guarantee hardware suitability/i);
   });
-  it('uses vSphere Kubernetes Service and distinguishes Supervisor from workloadclusters', () => {
+  it('uses vSphere Kubernetes Service and distinguishes Supervisor from workload clusters', () => {
     let doc = addNode(createEmptyDocument(), 'vks-cluster');
     let hints = getHints(doc);
-    expect(hints.some(h => /vSphere Kubernetes Service/.test(h.message) && /Supervisor/.test(h.message) && /Workloadcluster/.test(h.message))).toBe(true);
+    expect(hints.some(h => /vSphere Kubernetes Service/.test(h.message) && /Supervisor/.test(h.message) && /workload clusters/.test(h.message))).toBe(true);
     const missing = hints.find(h => h.id === 'vks-supervisor-scope');
-    expect(missing?.message).toMatch(/außerhalb.*Scope|außerhalb.*Ausschnitt/i);
+    expect(missing?.message).toMatch(/outside the selected scope/i);
     doc = addNode(doc, 'supervisor');
     hints = getHints(doc);
     expect(hints.some(h => h.id === 'vks-supervisor-scope')).toBe(false);
@@ -40,7 +40,8 @@ describe('nonbinding workshop hints', () => {
     doc = updateNode(doc, doc.nodes[1].id, { config: { version: '', instances: 7, notes: 'Eigene Workshop-Annahme' } });
     doc = connectNodes(doc, doc.nodes[0].id, doc.nodes[1].id, 'manages');
     expect(getHints(doc)).toEqual(before);
-    expect(before.map(h => h.message).join(' ')).not.toMatch(/muss|zwingend|mindestens|Pflichtkante/i);
+    expect(before.map(h => h.message).join(' ')).not.toMatch(/\bmust\b|\bmandatory\b|\bat least\b/i);
+    expect(before.find(h => h.id === 'profile-context')?.message).toContain('Selecting a profile does not confirm supportability or prescribe any relationship or quantity.');
     expect(before.some(h => h.message.includes(profile === 'vcf-9.0' ? 'VCF 9.0' : 'VCF 9.1'))).toBe(true);
   });
   it('keeps hint IDs stable across label changes for optional dismissal in the UI', () => {

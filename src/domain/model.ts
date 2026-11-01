@@ -48,7 +48,7 @@ function containChildren(doc: ArchitectureDocument): ArchitectureDocument {
 }
 
 export function createEmptyDocument(): ArchitectureDocument {
-  return { schemaVersion: 1, id: freshId('project'), title: 'Neue VCF-Architektur', profile: 'unspecified', mode: 'sandbox', nodes: [], edges: [] };
+  return { schemaVersion: 1, id: freshId('project'), title: 'New VCF Architecture', profile: 'unspecified', mode: 'sandbox', nodes: [], edges: [] };
 }
 
 export function addNode(doc: ArchitectureDocument, kind: ComponentKind, parentId?: string): ArchitectureDocument {
@@ -114,7 +114,7 @@ export function duplicateNode(doc: ArchitectureDocument, id: string): Architectu
   const copies = sourceNodes.map(node => {
     const copy: ArchitectureNode = { ...node, id: mapping.get(node.id)!, position: { ...node.position }, config: { ...node.config }, ...(node.size ? { size: { ...node.size } } : {}) };
     if (node.id === id) {
-      copy.label = `${node.label.slice(0, 192)} (Kopie)`;
+      copy.label = `${node.label.slice(0, 192)} (copy)`;
       copy.position = { x: Math.min(COORDINATE_LIMIT, node.position.x + 40), y: Math.min(COORDINATE_LIMIT, node.position.y + 40) };
     } else if (node.parentId) copy.parentId = mapping.get(node.parentId)!;
     return copy;
