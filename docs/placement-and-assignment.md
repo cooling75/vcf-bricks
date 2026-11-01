@@ -1,28 +1,33 @@
-# Platzieren und Zuordnen
+# Placement and assignment
 
-Diese Iteration konzentriert sich auf Bausteine und ihre logische Zuordnung. Kommunikationsbeziehungen sind nachrangig; vorhandene JSON-Verbindungen bleiben erhalten. Dark Mode, neue NSX-/VNA-Objekte und individuell einstellbare Schriftgrößen sind separate Folgeschritte.
+The main workflow is placing components and assigning them to logical frames. Communication relationships are secondary; existing JSON edges remain intact. Dark mode, additional NSX/VNA objects and individually adjustable font sizes are separate follow-up tasks.
 
-## Baustein hinzufügen
+## Add a component
 
-- Unter **Einfügen in** einen Rahmen oder die freie Baufläche wählen. Der vollständige Pfad macht verschachtelte Ziele unterscheidbar.
-- Ein Klick auf einen Katalogeintrag fügt den Baustein auf einem freien Platz im gewählten Ziel ein und fokussiert ihn.
-- Alternativ den Baustein aus dem Katalog auf die Baufläche ziehen. Der hervorgehobene Rahmen zeigt das tatsächliche Ablageziel. Bei verschachtelten Rahmen wird der innerste getroffene Rahmen gewählt.
-- Ein Drop auf die freie Baufläche fügt ohne übergeordneten Rahmen ein, unabhängig vom zuvor ausgewählten Einfügeziel.
-- Beim Auswählen eines Rahmens wird er zum Einfügeziel; beim Auswählen einer Komponente wird ihr Rahmen zum Ziel. Das Ziel ist jederzeit separat änderbar.
+- Choose a frame or the free canvas under **Insert into**. Full paths distinguish nested destinations.
+- Click a catalog entry to add the component in a free slot in the chosen target and focus it.
+- Alternatively, drag the entry from the catalog onto the canvas. The highlighted frame shows the actual drop target. For nested frames, the innermost frame under the pointer wins.
+- Dropping onto free canvas creates an unassigned component, regardless of the current insertion target.
+- Selecting a frame makes it the insertion target; selecting a component uses its parent frame. You can change the target independently at any time.
+- Catalog badges contain their short labels; full names wrap alongside them. Narrow screens use a single-column catalog. Hover or focus a catalog entry to see its description.
 
-## Bestehenden Baustein zuordnen
+## Reassign an existing component
 
-- Eine Komponente in einen anderen Rahmen ziehen. Der Zielrahmen wird während der Bewegung hervorgehoben. Außerhalb aller Rahmen wird sie auf die freie Baufläche verschoben.
-- Alternativ unter **Zugehöriger Rahmen** das neue Ziel wählen. Der Baustein erhält dort einen freien Platz und wird fokussiert.
-- Eigene Unterrahmen können nicht als Ziel einer übergeordneten Gruppe gewählt werden. Beim Verschieben eines Rahmens bleiben seine enthaltenen Bausteine relativ zu ihm erhalten.
-- **Rückgängig** und **Wiederholen** behandeln Position und Zuordnung als eine gemeinsame Änderung.
-- Neue Rahmen sind kompakter als zuvor und wachsen bei Bedarf für ihre Inhalte. Bestehende/importierte Rahmen werden nicht pauschal umgebaut.
+- Drag a component into another frame. The target frame is highlighted during the move. Dropping outside all frames moves it to the free canvas.
+- Alternatively, choose a destination under **Parent frame**. The component is placed in a free slot there and focused.
+- A group cannot be placed inside itself or its descendants. Moving a frame preserves the relative positions of its children.
+- **Undo** and **Redo** treat movement and reassignment as a single change.
+- New frames are compact and grow to accommodate their contents. Existing/imported frames are not indiscriminately resized.
 
-## Übersicht
+## Navigate
 
-- **Struktur** zeigt einen aufklappbaren Baum. Auswahl im Baum fokussiert das Element auf der Baufläche.
-- **Alles einpassen**, **Auswahl fokussieren** und **100 %** wechseln zwischen Überblick und Bearbeitung.
-- Rahmen haben größere Beschriftungen und eine breitere Griffzone. Die Schriftgröße ist in diesem Schritt noch nicht individuell konfigurierbar.
-- Kommunikationsbeziehungen sind in den Eigenschaften unter **Kommunikationsbeziehungen (optional)** eingeklappt. Bestehende Linien werden weiterhin angezeigt und unverändert exportiert.
+- **Structure** shows an expandable tree. Selecting a tree entry focuses that element on the canvas.
+- **Fit all**, **Focus selection** and **100%** switch between overview and editing.
+- Frames have larger labels and a wider drag handle. Their font size is not yet individually configurable.
+- Relationship editing is collapsed under **Communication relationships (optional)**. Existing lines remain visible and are exported unchanged.
 
-Die logische Zuordnung ist keine Aussage über physisches Hosting oder eine offizielle Architekturvalidierung. Touch-Benutzer können das Einfügeziel, Katalogklick und den Eigenschafteneditor verwenden; Katalog-Drag-and-drop nutzt die native Desktop-HTML-Drag-API.
+Logical assignment does not assert physical hosting or official architecture validation. Touch users can use the insertion target, catalog buttons and properties panel; catalog drag-and-drop uses the native desktop HTML drag API.
+
+## Language and existing drafts
+
+The interface uses English, including help, examples and validation messages. Changing interface text does not translate or rewrite saved project titles, component labels, notes or versions. New components and newly loaded examples use English defaults; old drafts keep their original text. JSON schema keys, component kinds and relationship kinds remain unchanged.

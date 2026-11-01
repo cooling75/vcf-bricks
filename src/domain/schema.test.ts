@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { ArchitectureDocument } from '../contracts';
 import { CATALOG } from './catalog';
-import { addNode, connectNodes, createEmptyDocument } from './model';
+import { addNode, connectNodes, createEmptyDocument, duplicateNode, updateNode } from './model';
 import { MAX_IMPORT_BYTES, parseProject, serializeProject } from './schema';
 
 function fixture(): ArchitectureDocument {
@@ -15,7 +15,7 @@ function reject(doc: unknown) {
   expect(result.ok).toBe(false);
   if (!result.ok) {
     expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors[0]).toMatch(/[äöüÄÖÜß]|Datei|Projekt|Feld|Ungültig|nicht|muss|darf|Baustein|Verbindung|Schema|Grenze/);
+    expect(result.errors[0]).toMatch(/Project|Component|Relationship|schema|field/);
   }
 }
 
@@ -34,9 +34,60 @@ describe('strict version-one project JSON', () => {
       expect(Object.getPrototypeOf(result.value.nodes[0])).toBe(Object.prototype);
     }
   });
-  it.each(['', '{', 'null', '[]', 'true', '42', '"text"'])('returns German errors without throwing for %j', input => {
+  it.each(['', '{', 'null', '[]', 'true', '42', '"text"'])('returns English errors without throwing for %j', input => {
     expect(() => parseProject(input)).not.toThrow();
-    expect(parseProject(input).ok).toBe(false);
+    expect(parseProject(input)).toEqual({ ok: false, errors: [input === '' || input === '{' ? 'The project file does not contain valid JSON.' : 'Project: A plain object is required.'] });
+  });
+  it('reports non-text input, oversized files and forbidden fields in English', () => {
+    expect(parseProject(null as never)).toEqual({ ok: false, errors: ['The project file must contain text.'] });
+    expect(parseProject(' '.repeat(MAX_IMPORT_BYTES + 1))).toEqual({ ok: false, errors: ['The project file must not exceed 1 MiB.'] });
+    expect(parseProject('{"constructor":{}}')).toEqual({ ok: false, errors: ['Unexpected field “constructor” in the project file.'] });
+  });
+  it.each([
+    ['schema version', (d: any) => { d.schemaVersion = 2; }, 'Unsupported schema version. Only schemaVersion 1 is allowed.'],
+    ['unknown field', (d: any) => { d.extra = true; }, 'Project: Unexpected field “extra”.'],
+    ['missing field', (d: any) => { delete d.title; }, 'Project: Missing field “title”.'],
+    ['blank title', (d: any) => { d.title = ' '; }, 'Project title: Invalid text (maximum 200 characters, cannot be blank).'],
+    ['configuration text', (d: any) => { d.nodes[0].config.notes = 1; }, 'Component 1: Notes: Invalid text (maximum 4000 characters).'],
+    ['coordinate', (d: any) => { d.nodes[0].position.x = null; }, 'Component 1: X: A finite number between -100000 and 100000 is required.'],
+    ['quantity', (d: any) => { d.nodes[0].config.instances = 1.5; }, 'Component 1: Instance count: An integer between 1 and 10000 is required.'],
+    ['width', (d: any) => { d.nodes[0].size.width = 0; }, 'Component 1: Width: A finite number between 80 and 10000 is required.'],
+    ['profile', (d: any) => { d.profile = 'unknown'; }, 'Project profile: Invalid or unsupported value.'],
+    ['component list', (d: any) => { d.nodes = {}; }, 'Components: An array with at most 200 entries is required.'],
+    ['duplicate ID', (d: any) => { d.nodes[1].id = d.nodes[0].id; }, (d: ArchitectureDocument) => `Component 2: ID: ID “${d.nodes[0].id}” is not unique.`],
+    ['missing parent', (d: any) => { d.nodes[0].parentId = 'missing'; }, 'Component “VCF Fleet”: Parent scope is missing.'],
+    ['non-boundary parent', (d: any) => { d.nodes[0].parentId = d.nodes[2].id; }, 'Component “VCF Fleet”: Only logical scopes can be parents.'],
+    ['cyclic parent', (d: any) => { d.nodes[0].parentId = d.nodes[0].id; }, 'Component “VCF Fleet”: Cycle in the scope hierarchy.'],
+    ['missing endpoint', (d: any) => { d.edges[0].target = 'missing'; }, 'Relationship 1: Source or target refers to a missing component.'],
+    ['self link', (d: any) => { d.edges[0].target = d.edges[0].source; }, 'Relationship 1: Self-links are not allowed.'],
+    ['duplicate relationship', (d: any) => { d.edges.push({ ...d.edges[0], id: 'another-edge' }); }, 'Relationship 2: An identical relationship already exists.'],
+  ] as const)('reports %s validation failures in English', (_name, mutate, message) => {
+    const doc = fixture();
+    mutate(doc);
+    expect(parseProject(serializeProject(doc))).toEqual({ ok: false, errors: [typeof message === 'function' ? message(doc) : message] });
+  });
+  it('preserves existing German titles, labels and configuration through round trips and new edits', () => {
+    const legacy = fixture();
+    legacy.title = 'Neue VCF-Architektur · München';
+    legacy.nodes[0].label = 'Beispiel-Fleet';
+    legacy.nodes[1].label = 'VCF-Instanz';
+    legacy.nodes[2].label = 'Verwaltung München – eigener Name';
+    for (const node of legacy.nodes) node.config = { version: '9.1 – unverändert', instances: 2, notes: 'Eigene Annahme: Größe später prüfen.\nÜbernahme unverändert.' };
+    const saved = serializeProject(legacy);
+    const parsed = parseProject(saved);
+    expect(parsed).toEqual({ ok: true, value: legacy });
+    if (!parsed.ok) throw new Error('Legacy fixture must parse');
+    const edited = updateNode(parsed.value, legacy.nodes[2].id, { position: { x: 30, y: 70 } });
+    const added = addNode(edited, 'external-storage');
+    const duplicated = duplicateNode(added, legacy.nodes[2].id);
+    expect(duplicated.title).toBe(legacy.title);
+    expect(duplicated.nodes.slice(0, 3)).toEqual(legacy.nodes.map((node, index) => index === 2 ? { ...node, position: { x: 30, y: 70 } } : node));
+    expect(duplicated.nodes[3].label).toBe('External Storage');
+    expect(duplicated.nodes[4].label).toBe('Verwaltung München – eigener Name (copy)');
+    expect(duplicated.nodes[4].config).toEqual(legacy.nodes[2].config);
+    expect(duplicated.edges).toEqual(legacy.edges);
+    expect(parseProject(serializeProject(duplicated))).toEqual({ ok: true, value: duplicated });
+    expect(serializeProject(legacy)).toBe(saved);
   });
   it('limits UTF-8 byte size to exactly one MiB before JSON parsing', () => {
     expect(MAX_IMPORT_BYTES).toBe(1_048_576);

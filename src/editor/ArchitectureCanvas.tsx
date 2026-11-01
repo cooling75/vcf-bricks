@@ -17,8 +17,8 @@ const ResizeContext = createContext<ArchitectureCanvasProps['onResize']>(() => u
 
 function ConnectionHandles() {
   return <>
-    <Handle id="in" type="target" position={Position.Left} aria-label="Verbindungsziel" />
-    <Handle id="out" type="source" position={Position.Right} aria-label="Verbindung beginnen" />
+    <Handle id="in" type="target" position={Position.Left} aria-label="Connection target" />
+    <Handle id="out" type="source" position={Position.Right} aria-label="Start connection" />
   </>;
 }
 
@@ -54,10 +54,10 @@ function FitViewButton({ selectedId }: { selectedId: string | null }) {
   const { fitView, zoomTo } = useReactFlow();
   return <div className="vcf-canvas__view-actions"><button className="vcf-canvas__button" type="button" onClick={() => void fitView({ padding: 0.12, duration: 250, maxZoom: 1 })}>
     <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M7 3H3v4m10-4h4v4M3 13v4h4m10-4v4h-4M7 7h6v6H7z" /></svg>
-    Alles einpassen
+    Fit all
   </button>
-    <button className="vcf-canvas__button" type="button" disabled={!selectedId} onClick={() => selectedId && void fitView({ nodes: [{ id: selectedId }], padding: 0.2, duration: 250, maxZoom: 1 })}>Auswahl fokussieren</button>
-    <button className="vcf-canvas__button" type="button" onClick={() => void zoomTo(1, { duration: 250 })}>100 %</button>
+    <button className="vcf-canvas__button" type="button" disabled={!selectedId} onClick={() => selectedId && void fitView({ nodes: [{ id: selectedId }], padding: 0.2, duration: 250, maxZoom: 1 })}>Focus selection</button>
+    <button className="vcf-canvas__button" type="button" onClick={() => void zoomTo(1, { duration: 250 })}>100%</button>
   </div>;
 }
 
@@ -96,7 +96,7 @@ function CanvasContent({ document, selectedId, insertionTargetId, focusRequest, 
     if (connection.source && connection.target) onConnect(connection.source, connection.target);
   }, [onConnect]);
 
-  return <section className="vcf-canvas" aria-label="Architektur-Baufläche" aria-describedby={descriptionId}
+  return <section className="vcf-canvas" aria-label="Architecture canvas" aria-describedby={descriptionId}
     onDragOver={event => {
       if (!onPlace || !Array.from(event.dataTransfer.types).includes(CATALOG_DRAG_TYPE)) { setHoveredId(undefined); return; }
       try {
@@ -132,8 +132,8 @@ function CanvasContent({ document, selectedId, insertionTargetId, focusRequest, 
         event.preventDefault(); event.stopPropagation(); onRemoveEdge(edgeId); setActiveEdgeId(null);
       }
     }}>
-    <p id={descriptionId} className="vcf-canvas__sr-only">Bausteine ziehen. Bereiche am Titel bewegen und nach Auswahl am Rahmen vergrößern. Von einem rechten Anschlusspunkt zu einem linken ziehen, um eine Verbindung zu erstellen. Verbindung auswählen und über den eingeblendeten Knopf entfernen. Alternativ Bausteinliste und Eigenschaften neben der Baufläche verwenden.</p>
-    <p className="vcf-canvas__sr-only" role="status" aria-live="polite">{hoveredId ? `Ablagebereich: ${document.nodes.find(node => node.id === hoveredId)?.label ?? hoveredId}` : 'Ablage auf freier Baufläche'}</p>
+    <p id={descriptionId} className="vcf-canvas__sr-only">Drag components. Move frames by their titles and resize selected frames at their borders. Drag from a right connection handle to a left one to create a connection. Select a connection and use the button to remove it. Alternatively, use the component list and properties panel beside the canvas.</p>
+    <p className="vcf-canvas__sr-only" role="status" aria-live="polite">{hoveredId ? `Drop target: ${document.nodes.find(node => node.id === hoveredId)?.label ?? hoveredId}` : 'Drop on free canvas'}</p>
     <TargetContext.Provider value={{ hoveredId, insertionId: insertionTargetId }}>
     <ResizeContext.Provider value={onResize}>
       <ReactFlow<BrickFlowNode>
@@ -164,7 +164,7 @@ function CanvasContent({ document, selectedId, insertionTargetId, focusRequest, 
         deleteKeyCode={null} multiSelectionKeyCode={null}
         elevateNodesOnSelect={false} selectNodesOnDrag={false}
         nodesFocusable edgesFocusable
-        ariaLabelConfig={{ 'controls.zoomIn.ariaLabel': 'Vergrößern', 'controls.zoomOut.ariaLabel': 'Verkleinern', 'controls.fitView.ariaLabel': 'Ansicht einpassen' }}
+        ariaLabelConfig={{ 'controls.zoomIn.ariaLabel': 'Zoom in', 'controls.zoomOut.ariaLabel': 'Zoom out', 'controls.fitView.ariaLabel': 'Fit all' }}
       >
         <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#c9d5e3" />
         <Controls showInteractive={false} showFitView={false} />
@@ -172,10 +172,10 @@ function CanvasContent({ document, selectedId, insertionTargetId, focusRequest, 
         {activeEdge && <Panel position="bottom-center">
           <div className="vcf-canvas__edge-actions">
             <span>{String(activeEdge.label)}</span>
-            <button className="vcf-canvas__button vcf-canvas__button--danger" type="button" onClick={() => { onRemoveEdge(activeEdge.id); setActiveEdgeId(null); }}>Verbindung entfernen</button>
+            <button className="vcf-canvas__button vcf-canvas__button--danger" type="button" onClick={() => { onRemoveEdge(activeEdge.id); setActiveEdgeId(null); }}>Remove connection</button>
           </div>
         </Panel>}
-        {!graph.nodes.length && <Panel position="top-center"><div className="vcf-canvas__empty">Baustein aus der Palette hinzufügen, um zu beginnen.</div></Panel>}
+        {!graph.nodes.length && <Panel position="top-center"><div className="vcf-canvas__empty">Add a component from the catalog to get started.</div></Panel>}
       </ReactFlow>
     </ResizeContext.Provider>
     </TargetContext.Provider>

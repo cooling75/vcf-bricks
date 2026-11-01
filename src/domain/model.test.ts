@@ -13,7 +13,7 @@ describe('immutable architecture model', () => {
     const a = createEmptyDocument(), b = createEmptyDocument();
     expect(a).toMatchObject({ schemaVersion: 1, profile: 'unspecified', mode: 'sandbox', nodes: [], edges: [] });
     expect(a.id).not.toBe(b.id);
-    expect(a.title).toBeTruthy();
+    expect(a.title).toBe('New VCF Architecture');
     expect(a.nodes).not.toBe(b.nodes);
   });
   it('adds all kinds with labels, fresh config, finite positions and boundary dimensions', () => {
@@ -119,7 +119,7 @@ describe('immutable architecture model', () => {
     const next = duplicateNode(a.doc, a.node.id);
     expect(next.nodes).toHaveLength(2);
     expect(next.nodes[1].id).not.toBe(a.node.id);
-    expect(next.nodes[1].label).toContain('Kopie');
+    expect(next.nodes[1].label).toBe('vCenter Server (copy)');
     expect(next.edges).toEqual([]);
   });
   it('reparents using boundary parents, preserving absolute coordinates and preventing cycles', () => {
