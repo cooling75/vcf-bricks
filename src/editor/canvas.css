@@ -42,16 +42,23 @@
 }
 .vcf-canvas .vcf-canvas__boundary.is-selected { box-shadow: 0 0 0 3px #2563eb22; }
 .vcf-canvas .vcf-canvas__boundary-header {
-  position: absolute; top: -13px; left: 14px;
-  max-width: calc(100% - 40px);
+  position: absolute; top: 0; left: 12px;
+  min-height: 48px; box-sizing: border-box;
+  user-select: none; touch-action: none;
+  max-width: calc(100% - 24px);
   display: flex; align-items: center; gap: 8px;
-  padding: 4px 9px;
+  padding: 8px 12px;
   background: #f5f8fc;
   border-radius: 5px;
   font-size: 11px;
   cursor: grab;
 }
-.vcf-canvas .vcf-canvas__boundary-header strong { max-width: 300px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-weight: 650; }
+.vcf-canvas .vcf-canvas__boundary-header strong { min-width: 0; font-size: 20px; line-height: 1.25; overflow-wrap: anywhere; font-weight: 650; }
+.vcf-canvas .vcf-canvas__boundary[data-insertion-target] { outline: 3px dashed #7c3aed; outline-offset: 4px; }
+.vcf-canvas .vcf-canvas__boundary[data-drop-target] { border-color: #047857; background: #10b98112; box-shadow: 0 0 0 4px #10b98155; }
+.vcf-canvas .vcf-canvas__boundary[data-drop-target] > .vcf-canvas__boundary-header { background: #d1fae5; }
+.vcf-canvas .vcf-canvas__view-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+.vcf-canvas .vcf-canvas__button:disabled { opacity: .5; cursor: default; }
 .vcf-canvas .vcf-canvas__boundary-kind { color: var(--brick-color); font-size: 10px; font-weight: 750; white-space: nowrap; }
 .vcf-canvas .react-flow__handle { width: 9px; height: 9px; min-width: 9px; min-height: 9px; background: #fff; border: 2px solid var(--brick-color, #2563eb); }
 .vcf-canvas .react-flow__handle:hover, .vcf-canvas .react-flow__handle.connecting { background: #2563eb; border-color: #2563eb; }

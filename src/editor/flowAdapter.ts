@@ -1,6 +1,17 @@
 import { MarkerType, type Edge, type Node } from '@xyflow/react';
 import type { ArchitectureDocument, ArchitectureNode, CatalogItem, RelationKind } from '../contracts';
-import { getCatalogItem } from '../domain/catalog';
+import { CATALOG_DRAG_TYPE, type ComponentKind } from '../contracts';
+import { CATALOG, getCatalogItem } from '../domain/catalog';
+import { effectiveNodeSize } from '../domain/geometry';
+
+/** Drag payloads are untrusted and can be unavailable during dragover. */
+export function readCatalogKind(transfer: Pick<DataTransfer, 'types' | 'getData'>): ComponentKind | undefined {
+  try {
+    if (!Array.from(transfer.types).includes(CATALOG_DRAG_TYPE)) return undefined;
+    const value = transfer.getData(CATALOG_DRAG_TYPE);
+    return CATALOG.find(item => item.kind === value)?.kind;
+  } catch { return undefined; }
+}
 
 export interface BrickData extends Record<string, unknown> {
   architecture: ArchitectureNode;
@@ -39,8 +50,9 @@ export function toFlowGraph(document: ArchitectureDocument, selectedId: string |
   const nodes: BrickFlowNode[] = ordered.map(node => {
     const catalog = getCatalogItem(node.kind)!;
     const boundary = catalog.isBoundary;
-    const width = boundary ? (Number.isFinite(node.size?.width) && node.size!.width > 0 ? node.size!.width : 600) : 174;
-    const height = boundary ? (Number.isFinite(node.size?.height) && node.size!.height > 0 ? node.size!.height : 380) : 76;
+    const size = effectiveNodeSize(node);
+    const width = boundary ? size.width : 174;
+    const height = boundary ? size.height : 76;
     return {
       id: node.id,
       type: boundary ? 'boundaryNode' : 'componentBrick',
